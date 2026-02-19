@@ -1,0 +1,12 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars.json
+override.tf
+override.tf.json
+.terraform.lock.hcl
+
+# Optional: don't commit tfvars if it contains secrets
+# terraform.tfvars
