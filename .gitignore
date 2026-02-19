@@ -7,6 +7,7 @@ crash.log
 override.tf
 override.tf.json
 .terraform.lock.hcl
+login.ps1
 
 # Optional: don't commit tfvars if it contains secrets
 # terraform.tfvars
