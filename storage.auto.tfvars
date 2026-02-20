@@ -3,7 +3,7 @@ resource_groups = {
     name     = "rg-storage-dev-01"
     location = "eastus"
     tags = {
-      env = "dev"
+      env   = "dev"
       owner = "alex"
     }
   }

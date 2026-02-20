@@ -8,3 +8,11 @@ variable "storage_accounts" {
     tags                     = optional(map(string), {})
   }))
 }
+
+variable "resource_groups" {
+  type = map(object({
+    name     = string
+    location = string
+    tags     = optional(map(string), {})
+  }))
+}
