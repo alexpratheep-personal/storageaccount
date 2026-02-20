@@ -61,7 +61,62 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      - name: Terraform Apply (main only)
-        if: github.ref == 'refs/heads/main'
+  apply:
+    name: Terraform Apply (Approval)
+    needs: plan
+
+    # ✅ Apply ONLY on push to main (not PRs, not feature branches)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+    environment: production   # ✅ this triggers approval gate
+
+    container:
+      image: mcr.microsoft.com/azure-cli:2.60.0
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_TOKEN_app_terraform_io: ${{ secrets.TFC_TOKEN }}
+
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools + Terraform
+        shell: bash
+        run: |
+          apk add --no-cache bash curl jq git unzip
+          TF_VER="1.6.6"
+          curl -sSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip"
+          unzip -o /tmp/terraform.zip -d /usr/local/bin
+          terraform -version
+          az version
+
+      - name: Azure Login (OIDC)
+        shell: bash
+        run: |
+          OIDC_JSON=$(curl -sS -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=api://AzureADTokenExchange")
+          OIDC_TOKEN=$(echo "$OIDC_JSON" | jq -r '.value')
+
+          az login --service-principal \
+            --username "${ARM_CLIENT_ID}" \
+            --tenant "${ARM_TENANT_ID}" \
+            --federated-token "${OIDC_TOKEN}" \
+            --allow-no-subscriptions
+
+          az account set --subscription "${ARM_SUBSCRIPTION_ID}"
+
+      - name: Terraform Init (TFC backend)
+        run: terraform init -input=false
+
+      - name: Terraform Apply
         run: terraform apply -auto-approve
-        
