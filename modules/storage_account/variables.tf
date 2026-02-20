@@ -1,4 +1,4 @@
-variable "storage_accounts" {
+variable "sa" {
   type = map(object({
     name                     = string
     rg_key                   = string
