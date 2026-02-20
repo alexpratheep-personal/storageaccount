@@ -1,15 +1,7 @@
-variable "name" {
-  type        = string
-  description = "Resource Group name"
-}
-
-variable "location" {
-  type        = string
-  description = "Resource Group location"
-}
-
-variable "tags" {
-  type        = map(string)
-  description = "Tags for the Resource Group"
-  default     = {}
+variable "rg" {
+  type = object({
+    name     = string
+    location = string
+    tags     = optional(map(string), {})
+  })
 }
