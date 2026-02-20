@@ -15,6 +15,6 @@ permissions:
 jobs:
   call-terraform:
     uses: ./.github/workflows/terraform-reusable.yml
-    with:
-      tfvars_file: terraform.tfvars
+    # with:
+    #   tfvars_file: terraform.tfvars
     secrets: inherit
