@@ -2,16 +2,11 @@ name: Terraform Reusable Workflow
 
 on:
   workflow_call:
-    inputs:
-      tfvars_file:
-        required: true
-        type: string
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    # Azure CLI already included
     container:
       image: mcr.microsoft.com/azure-cli:2.60.0
 
@@ -57,15 +52,15 @@ jobs:
 
           az account set --subscription "${ARM_SUBSCRIPTION_ID}"
 
-      - name: Terraform Init
+      - name: Terraform Init (TFC backend)
         run: terraform init -input=false
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file="${{ inputs.tfvars_file }}" -out=tfplan
+        run: terraform plan
 
       - name: Terraform Apply (main only)
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
