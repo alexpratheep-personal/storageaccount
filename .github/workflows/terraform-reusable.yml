@@ -11,8 +11,9 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
+    # Azure CLI already included
     container:
-      image: hashicorp/terraform:1.6.6
+      image: mcr.microsoft.com/azure-cli:2.60.0
 
     permissions:
       id-token: write
@@ -31,21 +32,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Azure CLI (venv)
+      - name: Install tools + Terraform
         shell: bash
         run: |
-          apk add --no-cache bash curl jq git python3 py3-pip py3-virtualenv
-          python3 -m venv /opt/azvenv
-          . /opt/azvenv/bin/activate
-          pip install --upgrade pip
-          pip install azure-cli
+          apk add --no-cache bash curl jq git unzip
+          TF_VER="1.6.6"
+          curl -sSLo /tmp/terraform.zip "https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip"
+          unzip -o /tmp/terraform.zip -d /usr/local/bin
+          terraform -version
           az version
 
       - name: Azure Login (OIDC)
         shell: bash
         run: |
-          . /opt/azvenv/bin/activate
-
           OIDC_JSON=$(curl -sS -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
             "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=api://AzureADTokenExchange")
           OIDC_TOKEN=$(echo "$OIDC_JSON" | jq -r '.value')
