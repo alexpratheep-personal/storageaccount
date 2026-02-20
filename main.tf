@@ -7,7 +7,7 @@ module "resource_groups" {
 
 module "storage_accounts" {
   source   = "./modules/storage_account"
-  for_each = var.storage_accounts
-  sa       = each.value
-}
+  for_each = local.storage_accounts_resolved
 
+  sa = each.value
+}

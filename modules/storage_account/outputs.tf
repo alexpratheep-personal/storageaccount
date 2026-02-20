@@ -1,8 +1,7 @@
 output "id" {
-  value = azurerm_storage_account.sgt.id
-
+  value = azurerm_storage_account.this.id
 }
 
 output "name" {
-  value = azurerm_storage_account.sgt.name
+  value = azurerm_storage_account.this.name
 }
