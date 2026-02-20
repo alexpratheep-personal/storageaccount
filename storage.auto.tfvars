@@ -1,19 +1,24 @@
+resource_groups = {
+  rg1 = {
+    name     = "rg-storage-dev-01"
+    location = "eastus"
+    tags = { env = "dev" }
+  }
+}
+
 storage_accounts = {
   sa1 = {
-    name                     = "st01"
-    resource_group_name      = "rg-storage-01"
-    location                 = "centralindia"
+    name                     = "storagedev01abc123"   # must be globally unique
+    rg_key                   = "rg1"
     account_tier             = "Standard"
     account_replication_type = "LRS"
-    tags                     = { env = "dev" }
+    tags = { app = "demo" }
   }
 
   sa2 = {
-    name                     = "st02"
-    resource_group_name      = "rg-storage-01"
-    location                 = "centralindia"
+    name                     = "storagedev02abc123"
+    rg_key                   = "rg1"
     account_tier             = "Standard"
-    account_replication_type = "ZRS"
-    tags                     = { env = "dev" }
+    account_replication_type = "GRS"
   }
 }
