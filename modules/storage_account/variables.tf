@@ -6,4 +6,4 @@ variable "storage_accounts" {
     account_replication_type = string
     tags                     = optional(map(string), {})
   }))
-}s
+}
